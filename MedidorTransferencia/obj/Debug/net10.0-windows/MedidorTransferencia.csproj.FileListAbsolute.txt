@@ -1,0 +1,14 @@
+C:\Users\bunni\data-transfer-oac\MedidorTransferencia\bin\Debug\net10.0-windows\MedidorTransferencia.exe
+C:\Users\bunni\data-transfer-oac\MedidorTransferencia\bin\Debug\net10.0-windows\MedidorTransferencia.deps.json
+C:\Users\bunni\data-transfer-oac\MedidorTransferencia\bin\Debug\net10.0-windows\MedidorTransferencia.runtimeconfig.json
+C:\Users\bunni\data-transfer-oac\MedidorTransferencia\bin\Debug\net10.0-windows\MedidorTransferencia.dll
+C:\Users\bunni\data-transfer-oac\MedidorTransferencia\bin\Debug\net10.0-windows\MedidorTransferencia.pdb
+C:\Users\bunni\data-transfer-oac\MedidorTransferencia\obj\Debug\net10.0-windows\MedidorTransferencia.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\bunni\data-transfer-oac\MedidorTransferencia\obj\Debug\net10.0-windows\MedidorTransferencia.AssemblyInfoInputs.cache
+C:\Users\bunni\data-transfer-oac\MedidorTransferencia\obj\Debug\net10.0-windows\MedidorTransferencia.AssemblyInfo.cs
+C:\Users\bunni\data-transfer-oac\MedidorTransferencia\obj\Debug\net10.0-windows\MedidorTransferencia.csproj.CoreCompileInputs.cache
+C:\Users\bunni\data-transfer-oac\MedidorTransferencia\obj\Debug\net10.0-windows\MedidorTransferencia.dll
+C:\Users\bunni\data-transfer-oac\MedidorTransferencia\obj\Debug\net10.0-windows\refint\MedidorTransferencia.dll
+C:\Users\bunni\data-transfer-oac\MedidorTransferencia\obj\Debug\net10.0-windows\MedidorTransferencia.pdb
+C:\Users\bunni\data-transfer-oac\MedidorTransferencia\obj\Debug\net10.0-windows\MedidorTransferencia.genruntimeconfig.cache
+C:\Users\bunni\data-transfer-oac\MedidorTransferencia\obj\Debug\net10.0-windows\ref\MedidorTransferencia.dll
