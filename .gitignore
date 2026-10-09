@@ -1,1 +1,7 @@
 Actividad.md
+
+# Compilación .NET
+[Bb]in/
+[Oo]bj/
+.vs/
+*.user
