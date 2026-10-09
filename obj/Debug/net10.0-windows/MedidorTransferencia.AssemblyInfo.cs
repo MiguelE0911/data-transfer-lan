@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("MedidorTransferencia")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+15cb83f94ae76beb7270734c3bf9ae3afe2fb5bb")]
 [assembly: System.Reflection.AssemblyProductAttribute("MedidorTransferencia")]
 [assembly: System.Reflection.AssemblyTitleAttribute("MedidorTransferencia")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

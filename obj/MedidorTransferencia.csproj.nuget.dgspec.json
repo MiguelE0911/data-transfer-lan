@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\bunni\\data-transfer-oac\\MedidorTransferencia\\MedidorTransferencia.csproj": {}
+    "c:\\Users\\bunni\\data-transfer-oac\\MedidorTransferencia.csproj": {}
   },
   "projects": {
-    "C:\\Users\\bunni\\data-transfer-oac\\MedidorTransferencia\\MedidorTransferencia.csproj": {
+    "c:\\Users\\bunni\\data-transfer-oac\\MedidorTransferencia.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\bunni\\data-transfer-oac\\MedidorTransferencia\\MedidorTransferencia.csproj",
+        "projectUniqueName": "c:\\Users\\bunni\\data-transfer-oac\\MedidorTransferencia.csproj",
         "projectName": "MedidorTransferencia",
-        "projectPath": "C:\\Users\\bunni\\data-transfer-oac\\MedidorTransferencia\\MedidorTransferencia.csproj",
+        "projectPath": "c:\\Users\\bunni\\data-transfer-oac\\MedidorTransferencia.csproj",
         "packagesPath": "C:\\Users\\bunni\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\bunni\\data-transfer-oac\\MedidorTransferencia\\obj\\",
+        "outputPath": "c:\\Users\\bunni\\data-transfer-oac\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\bunni\\AppData\\Roaming\\NuGet\\NuGet.Config",
