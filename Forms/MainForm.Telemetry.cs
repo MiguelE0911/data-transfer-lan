@@ -10,7 +10,6 @@ public partial class MainForm
         else
             RestoreTelemetry();
 
-        LayoutZoomButton();
         UpdateZoomButton();
     }
 
@@ -47,15 +46,6 @@ public partial class MainForm
         _telemetryExpanded = false;
     }
 
-    private void LayoutZoomButton()
-    {
-        if (_telemetryCard == null || _btnZoom == null)
-            return;
-
-        int x = _telemetryCard.ClientSize.Width - _btnZoom.Width - 16;
-        _btnZoom.Location = new Point(Math.Max(0, x), 10);
-    }
-
     private void UpdateZoomButton()
     {
         if (_btnZoom == null)
@@ -63,5 +53,27 @@ public partial class MainForm
 
         _btnZoom.Glyph = _telemetryExpanded ? GlyphRestore : GlyphExpand;
         _toolTip.SetToolTip(_btnZoom, _telemetryExpanded ? "Restaurar telemetría" : "Expandir telemetría");
+    }
+
+    // Coloca un botón de icono en la esquina superior derecha de una tarjeta y lo
+    // reposiciona cuando la tarjeta cambia de tamaño.
+    private void AttachCornerButton(Card card, FlatButton button, string tooltip)
+    {
+        button.Height = 28;
+        button.CornerRadius = 6;
+        button.GlyphSize = 14;
+        button.Margin = new Padding(0);
+        card.Controls.Add(button);
+        button.BringToFront();
+
+        void Place()
+        {
+            int x = card.ClientSize.Width - button.Width - 16;
+            button.Location = new Point(Math.Max(0, x), 10);
+        }
+
+        card.Resize += (_, _) => Place();
+        Place();
+        _toolTip.SetToolTip(button, tooltip);
     }
 }

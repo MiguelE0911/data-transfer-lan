@@ -3,9 +3,20 @@ using System.Drawing.Drawing2D;
 public class Card : Panel
 {
     private int _cornerRadius = 12;
+    private string _title = "";
+    private Color _accent = Theme.Accent;
 
-    public string Title { get; set; } = "";
-    public Color Accent { get; set; } = Theme.Accent;
+    public string Title
+    {
+        get => _title;
+        set { _title = value ?? ""; Invalidate(); }
+    }
+
+    public Color Accent
+    {
+        get => _accent;
+        set { _accent = value; Invalidate(); }
+    }
 
     public int CornerRadius
     {

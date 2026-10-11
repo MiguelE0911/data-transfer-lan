@@ -7,9 +7,14 @@ public static class Theme
     public static readonly Color SurfaceAlt = Color.FromArgb(0x14, 0x1B, 0x29);
     public static readonly Color Border = Color.FromArgb(0x2A, 0x35, 0x48);
     public static readonly Color Text = Color.FromArgb(0xE6, 0xEC, 0xF5);
-    public static readonly Color Muted = Color.FromArgb(0x93, 0xA3, 0xBD);
+    public static readonly Color Muted = Color.FromArgb(0xA5, 0xB3, 0xCB);
     public static readonly Color RowAlt = Color.FromArgb(0x14, 0x1B, 0x29);
     public static readonly Color InputBg = Color.FromArgb(0x11, 0x18, 0x28);
+
+    public static readonly Color RowFail = Color.FromArgb(0x3A, 0x1E, 0x24);
+    public static readonly Color OkText = Color.FromArgb(0x7A, 0xDF, 0x9A);
+    public static readonly Color FailText = Color.FromArgb(0xFF, 0x9A, 0x9A);
+    public static readonly Color Warning = Color.FromArgb(0xE0, 0xB0, 0x50);
 
     public static readonly Color Accent = Color.FromArgb(0x4C, 0x8D, 0xF6);
     public static readonly Color AccentDark = Color.FromArgb(0x3B, 0x6F, 0xD6);

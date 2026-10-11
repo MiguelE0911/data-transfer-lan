@@ -19,6 +19,22 @@ public static class Metrics
             ? 0
             : (bytes * 8.0 / seconds) / nominalBitsPerSecond * 100.0;
 
+    public static string FormatBytes(long bytes)
+    {
+        string[] units = { "B", "KB", "MB", "GB", "TB" };
+        double size = bytes;
+        int unit = 0;
+        while (size >= 1000 && unit < units.Length - 1)
+        {
+            size /= 1000;
+            unit++;
+        }
+
+        return unit == 0
+            ? $"{bytes} B"
+            : $"{size.ToString("F2", CultureInfo.InvariantCulture)} {units[unit]}";
+    }
+
     public static double ParseLinkSpeedToBitsPerSecond(string linkSpeed)
     {
         if (string.IsNullOrWhiteSpace(linkSpeed))

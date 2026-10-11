@@ -51,6 +51,26 @@ public class FlatButton : Button
         BorderColor = Theme.Border
     };
 
+    public void ApplyPrimary()
+    {
+        BaseColor = Theme.Accent;
+        HoverColor = Theme.AccentDark;
+        PressColor = Theme.AccentDark;
+        ForeColor = Color.White;
+        BorderColor = Color.Transparent;
+        Invalidate();
+    }
+
+    public void ApplySecondary()
+    {
+        BaseColor = Theme.Secondary;
+        HoverColor = Theme.SecondaryHover;
+        PressColor = Theme.SecondaryPress;
+        ForeColor = Theme.Text;
+        BorderColor = Theme.Border;
+        Invalidate();
+    }
+
     protected override void OnMouseEnter(EventArgs e) { _hover = true; Invalidate(); base.OnMouseEnter(e); }
     protected override void OnMouseLeave(EventArgs e) { _hover = false; _pressed = false; Invalidate(); base.OnMouseLeave(e); }
     protected override void OnMouseDown(MouseEventArgs e) { _pressed = true; Invalidate(); base.OnMouseDown(e); }

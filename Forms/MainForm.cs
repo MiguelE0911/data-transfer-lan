@@ -12,6 +12,7 @@ public partial class MainForm : Form
     private const string GlyphCheck = "\uE73E";
     private const string GlyphExpand = "\uE740";
     private const string GlyphRestore = "\uE73F";
+    private const string GlyphPower = "\uE7E8";
 
     private readonly TextBox txtDestino = new() { Text = @"\\192.168.100.10\Velocidad" };
     private readonly TextBox txtEstudiante = new() { Text = "FAST-Miguel" };
@@ -33,6 +34,7 @@ public partial class MainForm : Form
         BorderStyle = BorderStyle.None,
         HeaderStyle = ColumnHeaderStyle.Nonclickable,
         OwnerDraw = true,
+        AllowDrop = true,
         BackColor = Theme.Surface,
         ForeColor = Theme.Text,
         Font = Theme.BaseFont
@@ -61,18 +63,58 @@ public partial class MainForm : Form
         Value = 1000,
         BorderStyle = BorderStyle.FixedSingle
     };
+    private readonly NumericUpDown numBufferMb = new()
+    {
+        Minimum = 1,
+        Maximum = 256,
+        Increment = 1,
+        Value = 4,
+        BorderStyle = BorderStyle.FixedSingle
+    };
+    private readonly NumericUpDown numReintentos = new()
+    {
+        Minimum = 0,
+        Maximum = 5,
+        Increment = 1,
+        Value = 1,
+        BorderStyle = BorderStyle.FixedSingle
+    };
     private readonly CheckBox chkHash = new()
     {
         Text = "Verificar integridad SHA-256", AutoSize = true,
         ForeColor = Theme.Text, BackColor = Color.Transparent
     };
+    private readonly CheckBox chkMostrarResultado = new()
+    {
+        Text = "Mostrar resultado al terminar cada archivo", Checked = true, AutoSize = true,
+        ForeColor = Theme.Text, BackColor = Color.Transparent
+    };
 
     private readonly RoundedProgress progressArchivo = new() { Dock = DockStyle.Fill };
+    private readonly RoundedProgress progressTanda = new() { Dock = DockStyle.Fill, BarColor = Theme.HeaderAccent };
     private readonly Label lblVelocidad = new()
     {
         Text = "0.00 MB/s", AutoSize = true, TextAlign = ContentAlignment.MiddleCenter,
         ForeColor = Theme.Accent, Font = new Font("Segoe UI Semibold", 10F),
         Anchor = AnchorStyles.None
+    };
+    private readonly Label lblTanda = new()
+    {
+        Text = "", AutoSize = true, TextAlign = ContentAlignment.MiddleRight,
+        ForeColor = Theme.Muted, Font = Theme.SmallFont,
+        Anchor = AnchorStyles.Right
+    };
+    private readonly Label lblResumen = new()
+    {
+        Text = "", AutoSize = false, Dock = DockStyle.Fill, AutoEllipsis = true,
+        TextAlign = ContentAlignment.MiddleLeft, ForeColor = Theme.Muted, Font = Theme.SmallFont,
+        BackColor = Color.Transparent
+    };
+    private readonly Label lblRutaFinal = new()
+    {
+        Text = "", AutoSize = false, Dock = DockStyle.Fill, AutoEllipsis = true,
+        TextAlign = ContentAlignment.MiddleLeft, ForeColor = Theme.HeaderAccent, Font = Theme.SmallFont,
+        BackColor = Color.Transparent
     };
     private readonly SpeedChart speedChart = new() { Dock = DockStyle.Fill };
     private readonly SpeedGauge speedGauge = new() { Dock = DockStyle.Fill };
@@ -81,8 +123,12 @@ public partial class MainForm : Form
     private readonly FlatButton btnCancelar = FlatButton.Danger("Cancelar", GlyphCancel, 128);
     private readonly FlatButton btnExportar = FlatButton.Primary("Exportar log (CSV)...", GlyphSave, 190);
     private readonly FlatButton btnConectar = FlatButton.Primary("Conectar", GlyphLink, 112);
+    private readonly FlatButton btnDesconectar = FlatButton.Secondary("Desconectar", GlyphPower, 132);
     private readonly FlatButton btnDetectar = FlatButton.Primary("Detectar enlace", GlyphRefresh, 156);
     private readonly FlatButton btnVerificar = FlatButton.Secondary("Verificar conexión", GlyphCheck, 168);
+    private readonly FlatButton btnAgregarArchivos = FlatButton.Primary("Agregar archivos...", GlyphAdd, 168);
+    private readonly FlatButton btnAgregarCarpeta = FlatButton.Primary("Agregar carpeta...", GlyphFolder, 160);
+    private readonly FlatButton btnQuitar = FlatButton.Secondary("Quitar", GlyphRemove, 96);
 
     private readonly RichTextBox txtLog = new()
     {
@@ -98,44 +144,60 @@ public partial class MainForm : Form
     };
 
     private readonly List<TransferResult> _resultados = new();
+    private readonly List<FlatButton> _roundButtons = new();
     private readonly ToolTip _toolTip = new();
     private SplitContainer? _split;
     private TableLayoutPanel? _outerLayout;
     private Card? _telemetryCard;
     private Control? _telemetryHome;
     private FlatButton? _btnZoom;
+    private FlatButton? _btnLimpiar;
     private bool _telemetryExpanded;
     private string _subcarpeta = "RONDA_1";
     private CancellationTokenSource? _cts;
+    private int _runTotal;
+    private int _runDone;
 
     private sealed class FileEntry
     {
         public string Path { get; init; } = "";
         public long Bytes { get; init; }
+        public string State { get; set; } = "Pendiente";
     }
 
     public MainForm()
     {
         Text = "Medidor de Transferencia LAN";
-        Size = new Size(1160, 1020);
-        MinimumSize = new Size(1020, 800);
+        Size = new Size(1160, 1000);
+        MinimumSize = new Size(1020, 820);
         StartPosition = FormStartPosition.CenterScreen;
         Font = Theme.BaseFont;
         BackColor = Theme.Bg;
+        KeyPreview = true;
 
         StyleInputs();
         ConfigureGrid();
         ConfigureListView();
         BuildUi();
+
+        AcceptButton = btnCopiar;
+        KeyDown += MainForm_KeyDown;
+        FormClosing += MainForm_FormClosing;
+
+        LoadSettings();
+        RefreshResolvedPath();
+        RefreshSummary();
+        UpdateRoundButtons();
+
         AppendLog("Aplicación iniciada. Configure destino, usuario y archivos.");
 
         Load += (_, _) =>
         {
             if (_split == null || _split.Width <= 0)
                 return;
-            _split.Panel1MinSize = 300;
+            _split.Panel1MinSize = 340;
             _split.Panel2MinSize = 420;
-            int distance = Math.Clamp((int)(_split.Width * 0.46), 300, _split.Width - 420);
+            int distance = Math.Clamp((int)(_split.Width * 0.50), 340, _split.Width - 420);
             _split.SplitterDistance = distance;
         };
     }
@@ -147,6 +209,8 @@ public partial class MainForm : Form
         Theme.StyleInput(txtUsuario);
         Theme.StyleInput(txtPassword);
         Theme.StyleInput(numLimiteMbps);
+        Theme.StyleInput(numBufferMb);
+        Theme.StyleInput(numReintentos);
     }
 
     private void ConfigureGrid()
@@ -193,7 +257,7 @@ public partial class MainForm : Form
         lstArchivos.DrawSubItem += (_, e) =>
         {
             bool selected = e.Item?.Selected ?? false;
-            Color fore = selected ? Color.White : Theme.Text;
+            Color fore = selected ? Color.White : (e.Item?.ForeColor ?? Theme.Text);
             Color back = selected ? Theme.Selection : (e.ItemIndex % 2 == 0 ? Theme.Surface : Theme.RowAlt);
             using var brush = new SolidBrush(back);
             e.Graphics.FillRectangle(brush, e.Bounds);
@@ -201,5 +265,25 @@ public partial class MainForm : Form
                 new Rectangle(e.Bounds.X + 8, e.Bounds.Y, e.Bounds.Width - 8, e.Bounds.Height), fore,
                 TextFormatFlags.Left | TextFormatFlags.VerticalCenter | TextFormatFlags.EndEllipsis);
         };
+
+        lstArchivos.DragEnter += LstArchivos_DragEnter;
+        lstArchivos.DragDrop += LstArchivos_DragDrop;
+        lstArchivos.Resize += (_, _) => FitFileColumns();
+    }
+
+    // El encabezado es owner-draw: si las columnas no cubren todo el ancho, el
+    // área restante la pinta el control nativo (clara). Estiramos la última
+    // columna para cubrir todo el encabezado.
+    private void FitFileColumns()
+    {
+        if (lstArchivos.Columns.Count == 0)
+            return;
+
+        int others = 0;
+        for (int i = 0; i < lstArchivos.Columns.Count - 1; i++)
+            others += lstArchivos.Columns[i].Width;
+
+        int available = lstArchivos.ClientSize.Width - others;
+        lstArchivos.Columns[lstArchivos.Columns.Count - 1].Width = Math.Max(80, available);
     }
 }

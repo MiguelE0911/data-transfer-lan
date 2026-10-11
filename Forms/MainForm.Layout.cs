@@ -81,7 +81,7 @@ public partial class MainForm
         };
         content.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
         content.RowStyles.Add(new RowStyle(SizeType.Absolute, 210F));
-        content.RowStyles.Add(new RowStyle(SizeType.Absolute, 112F));
+        content.RowStyles.Add(new RowStyle(SizeType.Absolute, 152F));
         content.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
 
         content.Controls.Add(BuildDestinoCard(), 0, 0);
@@ -140,10 +140,12 @@ public partial class MainForm
         row0.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
         txtDestino.Dock = DockStyle.Fill;
         txtDestino.Margin = new Padding(6, 8, 6, 8);
+        txtDestino.TabIndex = 0;
         var btnExaminar = FlatButton.Secondary("Examinar", GlyphFolder, 108);
-        var btnRonda1 = MakeRondaButton("RONDA_1");
-        var btnRonda2 = MakeRondaButton("RONDA_2");
-        var btnSimultanea = MakeRondaButton("SIMULTANEA");
+        btnExaminar.TabIndex = 1;
+        var btnRonda1 = MakeRondaButton("RONDA_1", "Debe ser el nombre de la primera carpeta");
+        var btnRonda2 = MakeRondaButton("RONDA_2", "Debe ser el nombre de la segunda carpeta");
+        var btnSimultanea = MakeRondaButton("SIMULTANEA", "Debe ser el nombre de la carpeta de copia simultánea");
         row0.Controls.Add(MakeLabel("Ruta de destino (UNC):"), 0, 0);
         row0.Controls.Add(txtDestino, 1, 0);
         row0.Controls.Add(btnExaminar, 2, 0);
@@ -151,39 +153,56 @@ public partial class MainForm
         row0.Controls.Add(btnRonda2, 4, 0);
         row0.Controls.Add(btnSimultanea, 5, 0);
 
-        var row1 = new TableLayoutPanel { Dock = DockStyle.Fill, ColumnCount = 3, BackColor = Theme.Surface };
+        // Fila del estudiante + vista previa de la ruta final resuelta.
+        var row1 = new TableLayoutPanel { Dock = DockStyle.Fill, ColumnCount = 4, BackColor = Theme.Surface };
+        row1.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
+        row1.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 200F));
         row1.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
         row1.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
-        row1.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
         txtEstudiante.Dock = DockStyle.Fill;
         txtEstudiante.Margin = new Padding(6, 8, 6, 8);
-        chkCrearCarpetas.Margin = new Padding(12, 0, 0, 0);
+        txtEstudiante.TabIndex = 5;
+        chkCrearCarpetas.Margin = new Padding(12, 0, 12, 0);
         chkCrearCarpetas.Anchor = AnchorStyles.Left;
+        chkCrearCarpetas.TabIndex = 6;
+        lblRutaFinal.Margin = new Padding(0);
+        _toolTip.SetToolTip(lblRutaFinal, "");
         row1.Controls.Add(MakeLabel("Carpeta del estudiante:"), 0, 0);
         row1.Controls.Add(txtEstudiante, 1, 0);
         row1.Controls.Add(chkCrearCarpetas, 2, 0);
+        row1.Controls.Add(lblRutaFinal, 3, 0);
 
-        var row2 = new TableLayoutPanel { Dock = DockStyle.Fill, ColumnCount = 6, BackColor = Theme.Surface };
+        var row2 = new TableLayoutPanel { Dock = DockStyle.Fill, ColumnCount = 8, BackColor = Theme.Surface };
         row2.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
-        row2.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 140F));
+        row2.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 130F));
         row2.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
-        row2.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 140F));
+        row2.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 130F));
+        row2.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
+        row2.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
         row2.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
         row2.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
         txtUsuario.Dock = DockStyle.Fill;
         txtUsuario.Margin = new Padding(6, 8, 6, 8);
+        txtUsuario.TabIndex = 7;
         txtPassword.Dock = DockStyle.Fill;
         txtPassword.Margin = new Padding(6, 8, 12, 8);
+        txtPassword.TabIndex = 8;
         btnConectar.Margin = new Padding(0, 5, 8, 5);
         btnConectar.Anchor = AnchorStyles.Left;
-        btnVerificar.Margin = new Padding(0, 5, 0, 5);
+        btnConectar.TabIndex = 9;
+        btnVerificar.Margin = new Padding(0, 5, 8, 5);
         btnVerificar.Anchor = AnchorStyles.Left;
+        btnVerificar.TabIndex = 10;
+        btnDesconectar.Margin = new Padding(0, 5, 0, 5);
+        btnDesconectar.Anchor = AnchorStyles.Left;
+        btnDesconectar.TabIndex = 11;
         row2.Controls.Add(MakeLabel("Usuario:"), 0, 0);
         row2.Controls.Add(txtUsuario, 1, 0);
         row2.Controls.Add(MakeLabel("Contraseña:"), 2, 0);
         row2.Controls.Add(txtPassword, 3, 0);
         row2.Controls.Add(btnConectar, 4, 0);
         row2.Controls.Add(btnVerificar, 5, 0);
+        row2.Controls.Add(btnDesconectar, 6, 0);
 
         layout.Controls.Add(row0, 0, 0);
         layout.Controls.Add(row1, 0, 1);
@@ -192,15 +211,35 @@ public partial class MainForm
 
         btnExaminar.Click += BtnExaminar_Click;
         btnConectar.Click += BtnConectar_Click;
+        btnDesconectar.Click += BtnDesconectar_Click;
         btnVerificar.Click += BtnVerificar_Click;
+
+        // Botón para borrar las credenciales/opciones guardadas en disco.
+        var btnLimpiarCredenciales = FlatButton.Secondary("", GlyphRemove, 34);
+        btnLimpiarCredenciales.Click += (_, _) =>
+        {
+            AppSettings.Clear();
+            txtPassword.Clear();
+            AppendLog("Credenciales guardadas eliminadas.");
+        };
+        AttachCornerButton(card, btnLimpiarCredenciales, "Limpiar credenciales guardadas");
+
+        txtDestino.TextChanged += (_, _) => RefreshResolvedPath();
+        txtEstudiante.TextChanged += (_, _) => { RefreshResolvedPath(); RefreshSummary(); };
+        chkCrearCarpetas.CheckedChanged += (_, _) => RefreshResolvedPath();
+
         return card;
     }
 
-    private FlatButton MakeRondaButton(string text)
+    private FlatButton MakeRondaButton(string text, string tip)
     {
         var button = FlatButton.Secondary(text, GlyphFolder, 138);
         button.Margin = new Padding(6, 3, 0, 3);
+        button.Tag = text;
         button.Click += BtnRonda_Click;
+        button.TabIndex = 2 + _roundButtons.Count;
+        _toolTip.SetToolTip(button, tip);
+        _roundButtons.Add(button);
         return button;
     }
 
@@ -208,33 +247,57 @@ public partial class MainForm
     {
         var card = new Card { Title = "Configuración", Dock = DockStyle.Fill, Accent = Theme.Success };
 
-        var layout = new TableLayoutPanel { Dock = DockStyle.Fill, ColumnCount = 5, RowCount = 1, BackColor = Theme.Surface };
-        layout.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
-        layout.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 110F));
-        layout.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
-        layout.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
-        layout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
-        layout.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
+        var layout = new TableLayoutPanel { Dock = DockStyle.Fill, ColumnCount = 1, RowCount = 2, BackColor = Theme.Surface };
+        layout.RowStyles.Add(new RowStyle(SizeType.Absolute, 46F));
+        layout.RowStyles.Add(new RowStyle(SizeType.Absolute, 46F));
 
+        var row0 = new TableLayoutPanel { Dock = DockStyle.Fill, ColumnCount = 4, BackColor = Theme.Surface };
+        row0.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
+        row0.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 110F));
+        row0.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
+        row0.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
         numLimiteMbps.Anchor = AnchorStyles.Left;
         numLimiteMbps.Margin = new Padding(6, 0, 12, 0);
+        numLimiteMbps.TabIndex = 12;
+        numLimiteMbps.ValueChanged += (_, _) => { RefreshSummary(); RefreshGaugeLimit(); };
         btnDetectar.Margin = new Padding(0, 0, 16, 0);
         btnDetectar.Anchor = AnchorStyles.Left;
+        btnDetectar.TabIndex = 13;
+        row0.Controls.Add(MakeLabel("Límite de enlace (Mbps):"), 0, 0);
+        row0.Controls.Add(numLimiteMbps, 1, 0);
+        row0.Controls.Add(btnDetectar, 2, 0);
+        row0.Controls.Add(MakeHint("Tope teórico usado en los cálculos del informe."), 3, 0);
+
+        var row1 = new TableLayoutPanel { Dock = DockStyle.Fill, ColumnCount = 7, BackColor = Theme.Surface };
+        row1.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
+        row1.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 70F));
+        row1.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
+        row1.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 70F));
+        row1.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
+        row1.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
+        row1.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
+        numBufferMb.Anchor = AnchorStyles.Left;
+        numBufferMb.Margin = new Padding(6, 0, 16, 0);
+        numBufferMb.TabIndex = 14;
+        numReintentos.Anchor = AnchorStyles.Left;
+        numReintentos.Margin = new Padding(6, 0, 16, 0);
+        numReintentos.TabIndex = 16;
         chkHash.Anchor = AnchorStyles.Left;
-        chkHash.Margin = new Padding(0);
+        chkHash.Margin = new Padding(0, 0, 20, 0);
+        chkHash.TabIndex = 17;
+        chkMostrarResultado.Anchor = AnchorStyles.Left;
+        chkMostrarResultado.Margin = new Padding(0, 0, 20, 0);
+        chkMostrarResultado.TabIndex = 18;
+        row1.Controls.Add(MakeLabel("Búfer (MB):"), 0, 0);
+        row1.Controls.Add(numBufferMb, 1, 0);
+        row1.Controls.Add(MakeLabel("Reintentos:"), 2, 0);
+        row1.Controls.Add(numReintentos, 3, 0);
+        row1.Controls.Add(chkHash, 4, 0);
+        row1.Controls.Add(chkMostrarResultado, 5, 0);
+        row1.Controls.Add(MakeHint("La verificación SHA-256 relee el destino y aumenta el tiempo total."), 6, 0);
 
-        var hint = new Label
-        {
-            Text = "Tope teórico usado en los cálculos del informe.", AutoSize = true,
-            ForeColor = Theme.Muted, BackColor = Color.Transparent, Font = Theme.SmallFont,
-            Anchor = AnchorStyles.Left
-        };
-
-        layout.Controls.Add(MakeLabel("Límite de enlace (Mbps):"), 0, 0);
-        layout.Controls.Add(numLimiteMbps, 1, 0);
-        layout.Controls.Add(btnDetectar, 2, 0);
-        layout.Controls.Add(chkHash, 3, 0);
-        layout.Controls.Add(hint, 4, 0);
+        layout.Controls.Add(row0, 0, 0);
+        layout.Controls.Add(row1, 0, 1);
         card.Controls.Add(layout);
 
         btnDetectar.Click += BtnDetectar_Click;
@@ -248,22 +311,33 @@ public partial class MainForm
             Title = "Archivos a copiar", Dock = DockStyle.Fill, Accent = Theme.Accent,
             Margin = new Padding(0, 0, 0, 8)
         };
-        var layout = new TableLayoutPanel { Dock = DockStyle.Fill, ColumnCount = 1, RowCount = 2, BackColor = Theme.Surface };
+        var layout = new TableLayoutPanel { Dock = DockStyle.Fill, ColumnCount = 1, RowCount = 3, BackColor = Theme.Surface };
         layout.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
         layout.RowStyles.Add(new RowStyle(SizeType.Absolute, 56F));
-        lstArchivos.Columns.Add("Archivo", 240);
-        lstArchivos.Columns.Add("Tamaño", 120);
+        layout.RowStyles.Add(new RowStyle(SizeType.Absolute, 26F));
+        lstArchivos.Columns.Add("Archivo", 200);
+        lstArchivos.Columns.Add("Tamaño", 90);
+        lstArchivos.Columns.Add("Estado", 90);
+        FitFileColumns();
+        lstArchivos.TabIndex = 21;
         var buttons = new FlowLayoutPanel { Dock = DockStyle.Fill, FlowDirection = FlowDirection.LeftToRight, BackColor = Theme.Surface, Padding = new Padding(0, 10, 0, 0) };
-        var btnAgregar = FlatButton.Primary("Agregar archivos...", GlyphAdd, 182);
-        var btnQuitar = FlatButton.Secondary("Quitar", GlyphRemove, 104);
+        btnAgregarArchivos.Margin = new Padding(0);
+        btnAgregarArchivos.TabIndex = 19;
+        btnAgregarCarpeta.Margin = new Padding(8, 0, 0, 0);
+        btnAgregarCarpeta.TabIndex = 20;
         btnQuitar.Margin = new Padding(8, 0, 0, 0);
-        buttons.Controls.Add(btnAgregar);
+        btnQuitar.TabIndex = 21;
+        buttons.Controls.Add(btnAgregarArchivos);
+        buttons.Controls.Add(btnAgregarCarpeta);
         buttons.Controls.Add(btnQuitar);
+        lblResumen.Margin = new Padding(2, 0, 0, 0);
         layout.Controls.Add(lstArchivos, 0, 0);
         layout.Controls.Add(buttons, 0, 1);
+        layout.Controls.Add(lblResumen, 0, 2);
         card.Controls.Add(layout);
 
-        btnAgregar.Click += BtnAgregar_Click;
+        btnAgregarArchivos.Click += BtnAgregar_Click;
+        btnAgregarCarpeta.Click += BtnAgregarCarpeta_Click;
         btnQuitar.Click += BtnQuitar_Click;
         return card;
     }
@@ -285,6 +359,14 @@ public partial class MainForm
         dgvResultados.Columns.Add("Ideal", "Ideal (s)");
         dgvResultados.Columns.Add("Porcentaje", "%");
         dgvResultados.Columns.Add("Hash", "Hash");
+        foreach (DataGridViewColumn column in dgvResultados.Columns)
+            column.SortMode = DataGridViewColumnSortMode.Automatic;
+
+        dgvResultados.CellDoubleClick += DgvResultados_CellDoubleClick;
+
+        _btnLimpiar = FlatButton.Secondary("", GlyphRemove, 34);
+        _btnLimpiar.Click += (_, _) => ClearResults();
+        AttachCornerButton(card, _btnLimpiar, "Limpiar resultados");
         return card;
     }
 
@@ -296,39 +378,49 @@ public partial class MainForm
             Margin = new Padding(0, 0, 0, 8)
         };
 
-        // La fila del gráfico es la única flexible; la barra de progreso y la fila
-        // de botones tienen alto propio para que nunca se recorten.
-        var layout = new TableLayoutPanel { Dock = DockStyle.Fill, ColumnCount = 2, RowCount = 3, BackColor = Theme.Surface };
+        // La fila del gráfico es la única flexible; el progreso, la barra global y los
+        // botones tienen alto propio para que nunca se recorten.
+        var layout = new TableLayoutPanel { Dock = DockStyle.Fill, ColumnCount = 2, RowCount = 4, BackColor = Theme.Surface };
         layout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 58F));
         layout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 42F));
         layout.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
         layout.RowStyles.Add(new RowStyle(SizeType.Absolute, 28F));
+        layout.RowStyles.Add(new RowStyle(SizeType.Absolute, 20F));
         layout.RowStyles.Add(new RowStyle(SizeType.Absolute, 56F));
 
         speedChart.Margin = new Padding(0, 0, 10, 0);
         speedGauge.Margin = new Padding(10, 0, 0, 0);
         lblVelocidad.Anchor = AnchorStyles.None;
         progressArchivo.Margin = new Padding(0, 6, 10, 0);
+        progressTanda.Margin = new Padding(0, 4, 0, 0);
 
         layout.Controls.Add(speedChart, 0, 0);
         layout.Controls.Add(speedGauge, 1, 0);
         layout.Controls.Add(progressArchivo, 0, 1);
         layout.Controls.Add(lblVelocidad, 1, 1);
+        layout.Controls.Add(progressTanda, 0, 2);
+        layout.SetColumnSpan(progressTanda, 2);
 
         var buttonRow = new TableLayoutPanel
         {
-            Dock = DockStyle.Fill, ColumnCount = 2, RowCount = 1,
+            Dock = DockStyle.Fill, ColumnCount = 3, RowCount = 1,
             BackColor = Theme.Surface, Margin = new Padding(0)
         };
+        buttonRow.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
         buttonRow.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
         buttonRow.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
         btnCopiar.Anchor = AnchorStyles.Left;
         btnCopiar.Margin = new Padding(0, 0, 10, 0);
+        btnCopiar.TabIndex = 22;
         btnCancelar.Anchor = AnchorStyles.Left;
-        btnCancelar.Margin = new Padding(0);
+        btnCancelar.Margin = new Padding(0, 0, 10, 0);
+        btnCancelar.Enabled = false;
+        btnCancelar.TabIndex = 23;
+        lblTanda.Margin = new Padding(0);
         buttonRow.Controls.Add(btnCopiar, 0, 0);
         buttonRow.Controls.Add(btnCancelar, 1, 0);
-        layout.Controls.Add(buttonRow, 0, 2);
+        buttonRow.Controls.Add(lblTanda, 2, 0);
+        layout.Controls.Add(buttonRow, 0, 3);
         layout.SetColumnSpan(buttonRow, 2);
 
         card.Controls.Add(layout);
@@ -336,18 +428,11 @@ public partial class MainForm
 
         // Botón para ampliar/restaurar la tarjeta de telemetría a pantalla completa.
         _btnZoom = FlatButton.Secondary("", GlyphExpand, 34);
-        _btnZoom.Height = 28;
-        _btnZoom.CornerRadius = 6;
-        _btnZoom.GlyphSize = 14;
-        _btnZoom.Margin = new Padding(0);
         _btnZoom.Click += (_, _) => ToggleTelemetryExpanded();
-        card.Controls.Add(_btnZoom);
-        _btnZoom.BringToFront();
-        card.Resize += (_, _) => LayoutZoomButton();
-        _toolTip.SetToolTip(_btnZoom, "Expandir telemetría");
+        AttachCornerButton(card, _btnZoom, "Expandir telemetría");
 
         btnCopiar.Click += BtnCopiar_Click;
-        btnCancelar.Click += (_, _) => _cts?.Cancel();
+        btnCancelar.Click += BtnCancelar_Click;
         return card;
     }
 
@@ -376,6 +461,7 @@ public partial class MainForm
             Anchor = AnchorStyles.Left
         };
         btnExportar.Anchor = AnchorStyles.Right;
+        btnExportar.TabIndex = 25;
         footer.Controls.Add(hint, 0, 0);
         footer.Controls.Add(btnExportar, 1, 0);
 
@@ -391,5 +477,12 @@ public partial class MainForm
     {
         Text = text, AutoSize = true, ForeColor = Theme.Text, BackColor = Color.Transparent,
         Anchor = AnchorStyles.Left, TextAlign = ContentAlignment.MiddleLeft
+    };
+
+    private static Label MakeHint(string text) => new()
+    {
+        Text = text, AutoSize = false, Dock = DockStyle.Fill, AutoEllipsis = true,
+        ForeColor = Theme.Muted, BackColor = Color.Transparent, Font = Theme.SmallFont,
+        TextAlign = ContentAlignment.MiddleLeft, Margin = new Padding(0)
     };
 }

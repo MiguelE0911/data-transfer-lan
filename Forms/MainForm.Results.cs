@@ -4,7 +4,7 @@ public partial class MainForm
 {
     private void AddResultRow(TransferResult result)
     {
-        dgvResultados.Rows.Add(
+        int index = dgvResultados.Rows.Add(
             result.FileName,
             result.SizeBytes.ToString(CultureInfo.InvariantCulture),
             result.ElapsedSeconds.ToString("F3", CultureInfo.InvariantCulture),
@@ -13,6 +13,57 @@ public partial class MainForm
             result.IdealSeconds.ToString("F3", CultureInfo.InvariantCulture),
             result.PercentOfNominal.ToString("F1", CultureInfo.InvariantCulture),
             chkHash.Checked ? (result.HashVerified ? "OK" : "NO") : "-");
+
+        if (index < 0 || index >= dgvResultados.Rows.Count)
+            return;
+
+        var row = dgvResultados.Rows[index];
+        if (!result.Success)
+        {
+            row.DefaultCellStyle.ForeColor = Theme.FailText;
+            row.DefaultCellStyle.BackColor = Theme.RowFail;
+        }
+        else if (chkHash.Checked && !result.HashVerified)
+        {
+            row.DefaultCellStyle.ForeColor = Theme.Warning;
+        }
+    }
+
+    private void ClearResults()
+    {
+        if (_cts != null)
+            return;
+        if (dgvResultados.Rows.Count == 0 && _resultados.Count == 0)
+            return;
+
+        var answer = MessageBox.Show(this, "¿Limpiar la tabla de resultados?", "Limpiar resultados",
+            MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+        if (answer != DialogResult.Yes)
+            return;
+
+        dgvResultados.Rows.Clear();
+        _resultados.Clear();
+        foreach (ListViewItem item in lstArchivos.Items)
+            SetItemState(item, "Pendiente", Theme.Text);
+        AppendLog("Resultados limpiados.");
+    }
+
+    private void DgvResultados_CellDoubleClick(object? sender, DataGridViewCellEventArgs e)
+    {
+        if (e.RowIndex < 0 || e.RowIndex >= dgvResultados.Rows.Count)
+            return;
+
+        var row = dgvResultados.Rows[e.RowIndex];
+        var values = row.Cells.Cast<DataGridViewCell>().Select(c => c.Value?.ToString() ?? "");
+        try
+        {
+            Clipboard.SetText(string.Join('\t', values));
+            AppendLog($"Fila copiada al portapapeles: {row.Cells[0].Value}");
+        }
+        catch (Exception ex)
+        {
+            AppendLog("No se pudo copiar la fila: " + ex.Message);
+        }
     }
 
     private void LogResult(TransferResult result)
@@ -52,20 +103,5 @@ public partial class MainForm
         txtLog.SelectionColor = Theme.LogText;
         txtLog.SelectionStart = txtLog.TextLength;
         txtLog.ScrollToCaret();
-    }
-
-    private static string HumanSize(long bytes)
-    {
-        string[] units = { "B", "KB", "MB", "GB", "TB" };
-        double size = bytes;
-        int unit = 0;
-        while (size >= 1000 && unit < units.Length - 1)
-        {
-            size /= 1000;
-            unit++;
-        }
-        return unit == 0
-            ? $"{bytes} B"
-            : $"{size.ToString("F2", CultureInfo.InvariantCulture)} {units[unit]}";
     }
 }

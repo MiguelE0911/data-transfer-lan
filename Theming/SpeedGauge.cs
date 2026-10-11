@@ -8,6 +8,7 @@ public class SpeedGauge : Control
     public double Value { get => _value; set { _value = value; if (value > _maximum) _maximum = value * 1.12; Invalidate(); } }
     public double Maximum { get => _maximum; set { _maximum = value <= 0 ? 1 : value; Invalidate(); } }
     public string Unit { get; set; } = "MB/s";
+    public string Detail { get; set; } = "";
     public Color AccentColor { get; set; } = Theme.Accent;
     public string Caption { get; set; } = "Velocidad promedio";
 
@@ -79,6 +80,14 @@ public class SpeedGauge : Control
         var unitSize = g.MeasureString(Unit, Theme.SmallFont);
         using (var unitBrush = new SolidBrush(Theme.Muted))
             g.DrawString(Unit, Theme.SmallFont, unitBrush, cx - unitSize.Width / 2, cy - radius * 0.72f + valueSize.Height - 4);
+
+        if (!string.IsNullOrEmpty(Detail))
+        {
+            var detailSize = g.MeasureString(Detail, Theme.SmallFont);
+            using var detailBrush = new SolidBrush(Theme.Muted);
+            g.DrawString(Detail, Theme.SmallFont, detailBrush, cx - detailSize.Width / 2,
+                cy - radius * 0.72f + valueSize.Height + unitSize.Height - 6);
+        }
 
         var captionSize = g.MeasureString(Caption, Theme.SmallFont);
         using (var captionBrush = new SolidBrush(Theme.Muted))
